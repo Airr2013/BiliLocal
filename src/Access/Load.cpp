@@ -1,4 +1,4 @@
-﻿/*=======================================================================
+/*=======================================================================
 *
 *   Copyright (C) 2013-2015 Lysine.
 *
@@ -125,7 +125,7 @@ Load::Load(QObject *parent)
 					}
 				}
 				if (!id.isEmpty()){
-					api = "http://comment.%1/%2.xml";
+					api = "https://comment.%1/%2.xml";
 					api = api.arg(Utils::customUrl(Utils::Bilibili));
 					forward(QNetworkRequest(api.arg(id)), File);
 				}
@@ -489,7 +489,7 @@ Load::Load(QObject *parent)
 				int sta = head.indexOf("<chatid>") + 8, end = head.indexOf("</chatid>", sta);
 				if (sta != -1 && end != -1){
 					QString &s = load.source;
-					s = "http://comment.%1/%2.xml";
+					s = "https://comment.%1/%2.xml";
 					s = s.arg(Utils::customUrl(Utils::Bilibili));
 					s = s.arg(QString(head.mid(sta, end - sta)));
 				}
@@ -537,7 +537,7 @@ Load::Load(QObject *parent)
 		case None:
 		{
 			emit progressChanged(0);
-			QString api("http://comment.%1/rolldate,%2");
+			QString api("https://comment.%1/rolldate,%2");
 			api = api.arg(Utils::customUrl(Utils::Bilibili));
 			task.code = QUrlQuery(task.code.mid(5)).queryItemValue("source");
 			forward(QNetworkRequest(api.arg(QFileInfo(task.code).baseName())), Page);
@@ -553,7 +553,7 @@ Load::Load(QObject *parent)
 				break;
 			}
 			QJsonObject head = date.first().toObject();
-			QString url("http://comment.%1/dmroll,%2,%3");
+			QString url("https://comment.%1/dmroll,%2,%3");
 			url = url.arg(Utils::customUrl(Utils::Bilibili));
 			url = url.arg(head["timestamp"].toVariant().toInt());
 			url = url.arg(QFileInfo(task.code).baseName());
@@ -578,7 +578,7 @@ Load::Load(QObject *parent)
 				int now = 0;
 
 				auto getHistory = [d, &count, &task](int date) {
-					QString url("http://comment.%1/dmroll,%2,%3");
+					QString url("https://comment.%1/dmroll,%2,%3");
 					url = url.arg(Utils::customUrl(Utils::Bilibili));
 					url = url.arg(date);
 					url = url.arg(QFileInfo(task.code).baseName());
@@ -641,7 +641,7 @@ Load::Load(QObject *parent)
 		}
 	};
 
-	auto fullBiRegular = QRegularExpression("^full\\?source=http://comment\\.bilibili\\.com/\\d+\\.xml$");
+	auto fullBiRegular = QRegularExpression("^full\\?source=https?://comment\\.bilibili\\.com/\\d+\\.xml$");
 	fullBiRegular.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
 	d->pool.append({ getRegular(fullBiRegular), 100, fullBiProcess });
 
@@ -658,14 +658,14 @@ Load::Load(QObject *parent)
 			QString url;
 			QNetworkRequest request;
 			if (dat != "0" && dat.toUInt() != QDateTime(QDate::currentDate()).toTime_t()){
-				url = QString("http://comment.%1/dmroll,%2,%3");
+				url = QString("https://comment.%1/dmroll,%2,%3");
 				url = url.arg(Utils::customUrl(Utils::Bilibili));
 				url = url.arg(dat).arg(cid);
 				int limit = QDateTime(QDateTime::fromTime_t(dat.toInt()).date().addDays(1)).toTime_t();
 				request.setAttribute(QNetworkRequest::User, limit);
 			}
 			else{
-				url = QString("http://comment.%1/%2.xml").arg(Utils::customUrl(Utils::Bilibili));
+				url = QString("https://comment.%1/%2.xml").arg(Utils::customUrl(Utils::Bilibili));
 				url = url.arg(cid);
 			}
 			request.setUrl(url);
@@ -686,7 +686,7 @@ Load::Load(QObject *parent)
 		}
 		}
 	};
-	auto histBiRegular = QRegularExpression("^hist\\?source=http://comment\\.bilibili\\.com/\\d+\\.xml&date=\\d+$");
+	auto histBiRegular = QRegularExpression("^hist\\?source=https?://comment\\.bilibili\\.com/\\d+\\.xml&date=\\d+$");
 	histBiRegular.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
 	d->pool.append({ getRegular(histBiRegular), 100, histBiProcess });
 
