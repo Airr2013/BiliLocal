@@ -1,0 +1,34 @@
+name: Qt QMake CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.5.3'          
+        host: 'linux'
+        target: 'desktop'
+        modules: 'qtbase'         
+
+    - name: Build with qmake
+      run: |
+        mkdir build
+        cd build
+        qmake ../*.pro            
+        make
+
+    - name: Run tests (if any)
+      run: |
+        cd build
+        # 如果你的项目有自带测试，比如 make check 或运行可执行文件，在这里添加
